@@ -1,4 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import NavMenu from "./components/NavMenu";
 import Index from "./pages/Index.jsx";
 
 function App() {
