@@ -1,11 +1,20 @@
 import { Box, Button, Container, Heading, Input, Stack, Textarea, useToast, VStack } from "@chakra-ui/react";
 import { FaGrinStars, FaPlus } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+// Removed import of date-fns
 
 const Index = () => {
   const [gratitude, setGratitude] = useState("");
-  const [gratitudes, setGratitudes] = useState([]);
+  const [gratitudes, setGratitudes] = useState(() => {
+    const savedGratitudes = localStorage.getItem("gratitudes");
+    return savedGratitudes ? JSON.parse(savedGratitudes) : [];
+  });
   const toast = useToast();
+
+  useEffect(() => {
+    localStorage.setItem("gratitudes", JSON.stringify(gratitudes));
+  }, [gratitudes]);
 
   const handleAddGratitude = () => {
     if (gratitude.trim() === "") {
@@ -19,7 +28,11 @@ const Index = () => {
       return;
     }
 
-    setGratitudes([...gratitudes, gratitude]);
+    const newGratitude = {
+      text: gratitude,
+      timestamp: new Date().toISOString(),
+    };
+    setGratitudes([...gratitudes, newGratitude]);
     setGratitude("");
     toast({
       title: "Gratitude Added",
@@ -46,12 +59,17 @@ const Index = () => {
         </Button>
 
         <Stack spacing="4" w="100%">
-          {gratitudes.map((item, index) => (
+          {gratitudes.map(({ text, timestamp }, index) => (
             <Box key={index} p="4" bg="pink.100" borderRadius="md" boxShadow="md">
-              <Stack direction="row" align="center">
-                <FaGrinStars color="#FABD0F" size="24" />
-                <Text fontSize="lg" color="gray.700">
-                  {item}
+              <Stack direction="row" align="center" justify="space-between">
+                <Box>
+                  <FaGrinStars color="#FABD0F" size="24" />
+                  <Text fontSize="lg" color="gray.700">
+                    {text}
+                  </Text>
+                </Box>
+                <Text fontSize="sm" color="gray.500">
+                  {new Date(timestamp).toLocaleString()}
                 </Text>
               </Stack>
             </Box>
